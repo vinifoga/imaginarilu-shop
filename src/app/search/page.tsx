@@ -1,16 +1,24 @@
 // src/app/search/page.tsx
-import { Suspense } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import SearchResults from '@/components/SearchResults';
 import SearchBar from '@/components/SearchBar';
 
-interface SearchPageProps {
-    searchParams: {
-        q?: string;
-    };
-}
+export default function SearchPage() {
+    const searchParams = useSearchParams();
+    const [query, setQuery] = useState('');
+    const [isMounted, setIsMounted] = useState(false);
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
-    const query = searchParams.q || '';
+    useEffect(() => {
+        setIsMounted(true);
+        setQuery(searchParams.get('q') || '');
+    }, [searchParams]);
+
+    if (!isMounted) {
+        return <div className="container mx-auto px-4 py-8">Carregando...</div>;
+    }
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -19,9 +27,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 <SearchBar defaultValue={query} />
             </div>
 
-            <Suspense fallback={<div>Carregando resultados...</div>}>
-                <SearchResults query={query} />
-            </Suspense>
+            <SearchResults query={query} />
         </div>
     );
 }
