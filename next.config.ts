@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
 };
 
 module.exports = {
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
   images: {
     domains: [
       "dzjmykunmrwofsjewotx.supabase.co", // Seu domínio do Supabase

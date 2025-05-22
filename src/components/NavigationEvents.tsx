@@ -1,3 +1,4 @@
+// components/NavigationEvents.tsx
 'use client';
 
 import { useEffect } from 'react';
@@ -10,6 +11,8 @@ export function NavigationEvents() {
     const { setIsLoading } = useLoading();
 
     useEffect(() => {
+        const url = `${pathname}?${searchParams}`;
+        console.log('Navigation to:', url); // Debug opcional
         setIsLoading(false);
     }, [pathname, searchParams, setIsLoading]);
 
