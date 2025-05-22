@@ -1,60 +1,92 @@
 // app/categorias/[id]/page.tsx
-import ProductCard from '@/components/products/ProductCard';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabaseCliente';
-import BackButton from '@/components/BackButton';
+import ProductCard from '@/components/products/ProductCard';
+import { Product, Category } from '@/types';
 
-interface CategoryPageProps {
-    params: {
-        id: string;
-    };
-}
+export default function CategoryPage() {
+    const params = useParams();
+    const categoryId = params.id as string;
+    const [products, setProducts] = useState<Product[]>([]);
+    const [categoryName, setCategoryName] = useState('Categoria');
+    const [loading, setLoading] = useState(true);
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
-    // Busca produtos que contêm a categoria com o ID especificado
-    const { data: products } = await supabase
-        .from('public_products_with_components')
-        .select('*');
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setLoading(true);
 
-    // Filtra os produtos no lado do cliente pois o Supabase não suporta contains com JSON array
-    const filteredProducts = products?.filter(product =>
-        product.categories?.some((cat: { id: string }) => cat.id === params.id)
-    );
+            const { data: allProducts, error } = await supabase
+                .from('public_products_with_components')
+                .select('*');
 
-    // Obtém o nome da categoria
-    const categoryName = filteredProducts?.[0]?.categories?.find(
-        (cat: { id: string }) => cat.id === params.id
-    )?.name || 'Categoria';
+            if (error) {
+                console.error('Error fetching products:', error);
+                setLoading(false);
+                return;
+            }
 
-    const formattedProducts = filteredProducts?.map((product) => ({
-        ...product,
-        id: String(product.id),
-        nome: product.name,
-        preco: product.sale_price_virtual_store,
-        imagem_url: product.images?.[0] || '',
-        slug: String(product.id),
-        descricao: product.description,
-        isComposition: product.is_composition,
-    }));
+            const filteredProducts = allProducts?.filter(product =>
+                product.categories?.some((cat: { id: Category; }) => String(cat.id) === String(categoryId))
+            ) || [];
+
+            setProducts(filteredProducts as Product[]);
+
+            if (filteredProducts.length > 0) {
+                const category = filteredProducts[0].categories?.find(
+                    (cat: { id: Category; }) => String(cat.id) === String(categoryId)
+                );
+                setCategoryName(category?.name || 'Categoria');
+            }
+
+            setLoading(false);
+        };
+
+        fetchProducts();
+    }, [categoryId]);
+
+    if (loading) {
+        return <LoadingSpinner />;
+    }
+
+    if (products.length === 0) {
+        return (
+            <main className="container mx-auto px-4 py-8">
+                <h1 className="text-3xl font-bold mb-8">Categoria: {categoryName}</h1>
+                <p>Nenhum produto encontrado nesta categoria.</p>
+            </main>
+        );
+    }
 
     return (
         <main className="container mx-auto px-4 py-8">
-            <BackButton />
-
-            <section className="mb-12">
-                <h1 className="text-3xl font-bold mb-6">
-                    {categoryName}
-                </h1>
-
-                {formattedProducts?.length ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {formattedProducts.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-gray-600">Nenhum produto encontrado nesta categoria.</p>
-                )}
-            </section>
+            <h1 className="text-3xl font-bold mb-8">Categoria: {categoryName}</h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {products.map((product) => (
+                    <ProductCard
+                        key={String(product.id)}
+                        product={{
+                            id: String(product.id),
+                            nome: product.name,
+                            preco: product.sale_price_virtual_store,
+                            imagem_url: product.images?.[0] || '',
+                            descricao: product.description,
+                            isComposition: product.is_composition,
+                            categories: product.categories || undefined
+                        }}
+                    />
+                ))}
+            </div>
         </main>
+    );
+}
+
+function LoadingSpinner() {
+    return (
+        <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
     );
 }

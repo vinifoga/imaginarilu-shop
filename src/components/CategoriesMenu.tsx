@@ -1,29 +1,22 @@
-// components/CategoriesMenu.tsx
+'use client';
 import Link from 'next/link';
+import { useLoading } from '@/components/LoadingContext';
 
-interface Category {
-    id: string | number;
-    name: string;
-}
+export default function CategoriesMenu({ categories }: { categories: Array<{ id: string | number; name: string }> }) {
+    const { setIsLoading } = useLoading();
 
-interface CategoriesMenuProps {
-    categories: Category[];
-}
-
-export default function CategoriesMenu({ categories }: CategoriesMenuProps) {
     return (
-        <div className="overflow-x-auto py-4">
-            <div className="flex space-x-4 min-w-max">
-                {categories.map((category) => (
-                    <Link
-                        key={String(category.id)}
-                        href={`/categorias/${category.id}`}
-                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium whitespace-nowrap transition-colors text-black"
-                    >
-                        {category.name}
-                    </Link>
-                ))}
-            </div>
+        <div className="flex flex-wrap gap-2 justify-center mb-6">
+            {categories.map((category) => (
+                <Link
+                    key={String(category.id)}
+                    href={`/categorias/${category.id}`}
+                    className="px-4 py-2 bg-gray-100 text-black hover:bg-gray-200 rounded-full transition-colors"
+                    onClick={() => setIsLoading(true)}
+                >
+                    {category.name}
+                </Link>
+            ))}
         </div>
     );
 }

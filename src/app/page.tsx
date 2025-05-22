@@ -2,6 +2,8 @@ import ProductCard from '@/components/products/ProductCard';
 import { supabase } from '@/lib/supabaseCliente';
 import SearchBar from '@/components/SearchBar';
 import CategoriesMenu from '@/components/CategoriesMenu';
+import { NavigationEvents } from '@/components/NavigationEvents';
+import CategoryLink from '@/components/CategoryLink';
 
 type Product = {
   id: string | number;
@@ -29,15 +31,12 @@ type CategoryWithProducts = {
 };
 
 export default async function Home() {
-  // Consulta produtos e categorias
   const { data: products } = await supabase
     .from('public_products_with_components')
     .select('*')
-    .limit(20); // Aumentei o limite para ter mais produtos para categorizar
+    .limit(50);
 
-  // Organiza produtos por categoria
   const categoriesWithProducts: CategoryWithProducts[] = [];
-
   products?.forEach((product) => {
     product.categories?.forEach((category: { id: string | number; name: string }) => {
       const existingCategory: CategoryWithProducts | undefined = categoriesWithProducts.find(
@@ -76,13 +75,11 @@ export default async function Home() {
     });
   });
 
-  // Extrai as categorias únicas para o menu
   const uniqueCategories = categoriesWithProducts.map(category => ({
     id: category.id,
     name: category.name
   }));
 
-  // Produtos em destaque (poderia ser por algum critério específico)
   const featuredProducts = products?.slice(0, 4)?.map((product) => ({
     ...product,
     id: String(product.id),
@@ -120,12 +117,9 @@ export default async function Home() {
         <section key={String(category.id)} className="mb-16">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">{category.name}</h2>
-            <a
-              href={`/categorias/${category.id}`}
-              className="text-primary hover:underline"
-            >
+            <CategoryLink href={`/categorias/${category.id}`}>
               Ver tudo
-            </a>
+            </CategoryLink>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {category.products.slice(0, 4).map((product) => {
@@ -147,6 +141,9 @@ export default async function Home() {
           </div>
         </section>
       ))}
+      <>
+        <NavigationEvents />
+      </>
     </main>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useLoading } from '../LoadingContext';
 
 interface Product {
     id: string;
@@ -16,9 +17,11 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+    const { setIsLoading } = useLoading();
+
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
-            <Link href={`/products/${product.id}`} className="block h-full">
+            <Link href={`/products/${product.id}`} className="block h-full" onClick={() => setIsLoading(true)}>
                 {/* Imagem do produto com badge */}
                 <div className="relative h-48">
                     <Image
