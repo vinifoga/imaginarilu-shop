@@ -18,16 +18,10 @@ export default function SearchResults({ query }: SearchResultsProps) {
         const searchProducts = async () => {
             setLoading(true);
 
-            let queryBuilder = supabase
+            const { data, error } = await supabase
                 .from('public_products_with_components')
-                .select('*');
-
-            if (query) {
-                queryBuilder = queryBuilder
-                    .or(`name.ilike.%${query}%,description.ilike.%${query}%`);
-            }
-
-            const { data, error } = await queryBuilder;
+                .select('*')
+                .ilike('name', `%${query}%`);
 
             if (!error) {
                 setProducts(data || []);
@@ -36,15 +30,19 @@ export default function SearchResults({ query }: SearchResultsProps) {
             setLoading(false);
         };
 
-        searchProducts();
+        if (query) {
+            searchProducts();
+        } else {
+            setProducts([]);
+        }
     }, [query]);
 
     if (loading) {
-        return <div className="py-8 text-center">Buscando produtos...</div>;
+        return <div>Buscando produtos...</div>;
     }
 
     if (products.length === 0) {
-        return <div className="py-8 text-center">Nenhum produto encontrado para &quot;{query}&quot;</div>;
+        return <div>Nenhum produto encontrado para &quot;{query}&quot;</div>;
     }
 
     return (

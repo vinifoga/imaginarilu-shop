@@ -4,31 +4,7 @@ import SearchBar from '@/components/SearchBar';
 import CategoriesMenu from '@/components/CategoriesMenu';
 import { NavigationEvents } from '@/components/NavigationEvents';
 import CategoryLink from '@/components/CategoryLink';
-
-type Product = {
-  id: string | number;
-  name: string;
-  description: string;
-  sale_price_virtual_store: number;
-  is_composition: boolean;
-  components: Array<{
-    id: string | number;
-    name: string;
-    quantity: number;
-  }> | null;
-  categories: Array<{
-    id: string | number;
-    name: string;
-  }> | null;
-  images: string[] | null;
-  [key: string]: unknown;
-};
-
-type CategoryWithProducts = {
-  id: string | number;
-  name: string;
-  products: Product[];
-};
+import { CategoryWithProducts, Product } from '@/types';
 
 export default async function Home() {
   const { data: products } = await supabase
@@ -116,8 +92,11 @@ export default async function Home() {
       {categoriesWithProducts.map((category) => (
         <section key={String(category.id)} className="mb-16">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">{category.name}</h2>
-            <CategoryLink href={`/categorias/${category.id}`}>
+            <h2 className="text-2 xl font-bold">{category.name}</h2>
+            <CategoryLink
+              href={String(category.id)}
+              categoryName={category.name}
+            >
               Ver tudo
             </CategoryLink>
           </div>

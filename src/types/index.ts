@@ -4,6 +4,12 @@ export interface Category {
     name: string;
 }
 
+export interface CategoryWithProducts  {
+  id: string | number;
+  name: string;
+  products: Product[];
+}
+
 export interface Product {
     id: string | number;
     name: string;

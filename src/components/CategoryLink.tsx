@@ -1,23 +1,17 @@
-// components/CategoryLink.tsx
-'use client';
-
 import Link from 'next/link';
-import { useLoading } from './LoadingContext';
 
-export default function CategoryLink({
-    href,
-    children
-}: {
+interface CategoryLinkProps {
     href: string;
-    children: React.ReactNode
-}) {
-    const { setIsLoading } = useLoading();
+    categoryName: string;
+    children: React.ReactNode;
+}
 
+export default function CategoryLink({ href, categoryName, children }: CategoryLinkProps) {
     return (
         <Link
-            href={href}
-            onClick={() => setIsLoading(true)}
-            className="text-primary hover:underline"
+            href={`/categories/${href}`}
+            className="text-blue-500 hover:underline"
+            aria-label={`Ver todos os produtos da categoria ${categoryName}`}
         >
             {children}
         </Link>
