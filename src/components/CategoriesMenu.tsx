@@ -20,7 +20,7 @@ export default function CategoriesMenu({ categories }: CategoriesMenuProps) {
             {categories.map((category) => (
                 <Link
                     key={String(category.id)}
-                    href={`/categories/${category.id}`} // Atualizado para usar /categories
+                    href={`/categories/${category.id}`}
                     className="px-4 py-2 bg-gray-100 text-black hover:bg-gray-200 rounded-full transition-colors"
                     onClick={() => setIsLoading(true)}
                     aria-label={`Ver produtos da categoria ${category.name}`}

@@ -83,7 +83,7 @@ export default function ProductCard({ product }: { product: Product }) {
                         </p>
                         <button
                             className="mt-3 w-full bg-primary text-black py-2 rounded hover:bg-primary-dark transition-colors"
-                            onClick={(e) => e.preventDefault()} // Evita navegação ao clicar no botão
+                            onClick={(e) => e.preventDefault()}
                         >
                             Adicionar ao Carrinho
                         </button>
